@@ -18,12 +18,24 @@ if (isset($_SESSION['id']) && $_SESSION['time'] + 3600 > time()) {
 // 投稿を記録する
 if (!empty($_POST)) {
     if ($_POST['message'] != '') {
-        $message = $db->prepare('INSERT INTO posts SET member_id=?, message=?, reply_post_id=?, created=NOW()');
-        $message->execute(array(
-            $member['id'],
-            $_POST['message'],
-            $_POST['reply_post_id']
-        ));
+        $message = $db->prepare('INSERT INTO posts SET member_id=?, message=?, reply_post_id=?, retweet_post_id=?, created=NOW()');
+        //リツイートの場合
+        if($_POST['retweet_post_id'] != ''){
+            $message->execute(array(
+                $_POST['member_id'],
+                $_POST['message'],
+                $_POST['reply_post_id'],
+                $_POST['retweet_post_id']
+            ));
+        }else{
+        //通常の場合
+            $message->execute(array(
+                $member['id'],
+                $_POST['message'],
+                $_POST['reply_post_id'],
+                $_POST['retweet_post_id']
+            ));
+        }
 
         header('Location: index.php');
         exit();
@@ -96,6 +108,7 @@ function makeLink($value)
                     <dd>
                         <textarea name="message" cols="50" rows="5"><?php echo h($message); ?></textarea>
                         <input type="hidden" name="reply_post_id" value="<?php echo h($_REQUEST['res']); ?>" />
+                        <input type="hidden" name="retweet_post_id" value="" />
                     </dd>
                 </dl>
                 <div>
@@ -114,9 +127,26 @@ function makeLink($value)
 
                     <p class="day">
                         <!-- 課題：リツイートといいね機能の実装 -->
-                        <span class="retweet">
+                        <!-- <span class="retweet">
                             <img class="retweet-image" src="images/retweet-solid-gray.svg"><span style="color:gray;">12</span>
-                        </span>
+                        </span> -->
+
+                        <!-- RT機能 -->
+                        <form action="" method="post">
+                            <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
+                            <input type="hidden" name="member_id" value="<?php echo h($post['member_id']); ?>" />                        
+                            <input type="hidden" name="reply_post_id" value="" />
+
+                            <!-- retweet_post_id：初回リツイート時は投稿id、２回目以降はRTのidを使う -->
+                            <?php $retweetId = $post['retweet_post_id'] == 0 ? $post['id'] : $post['retweet_post_id']; ?>
+                            <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
+                            
+                            <span class="retweet">
+                                <input class="retweet-image" type="image" src="images/retweet-solid-gray.svg"/><span style="color:gray;">12</span>
+                            </span>
+                        </form>
+                        <!-- RT機能ここまで -->
+
                         <span class="favorite">
                             <img class="favorite-image" src="images/heart-solid-gray.svg"><span style="color:gray;">34</span>
                         </span>
