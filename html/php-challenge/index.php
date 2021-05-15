@@ -127,11 +127,19 @@ function makeLink($value)
 
                     <p class="day">
                         <!-- 課題：リツイートといいね機能の実装 -->
-                        <!-- <span class="retweet">
-                            <img class="retweet-image" src="images/retweet-solid-gray.svg"><span style="color:gray;">12</span>
-                        </span> -->
-
                         <!-- RT機能 -->
+                        <!-- RT数を取得する -->
+                        <?php
+                        if($post['retweet_post_id']){
+                            $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
+                            $retweetCounts->bindParam(1,$post['retweet_post_id'],PDO::PARAM_INT);
+                            $retweetCounts->execute();
+                            $retweetCount = $retweetCounts->fetch();                        
+                        }else{
+                            $retweetCount = 0;
+                        }
+                        ?>
+                        <!-- RTボタン -->
                         <form action="" method="post">
                             <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
                             <input type="hidden" name="member_id" value="<?php echo h($post['member_id']); ?>" />                        
@@ -142,7 +150,7 @@ function makeLink($value)
                             <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
                             
                             <span class="retweet">
-                                <input class="retweet-image" type="image" src="images/retweet-solid-gray.svg"/><span style="color:gray;">12</span>
+                                <input class="retweet-image" type="image" src="images/retweet-solid-gray.svg"/><span style="color:gray;"><?php echo $retweetCount['cnt']; ?></span>
                             </span>
                         </form>
                         <!-- RT機能ここまで -->
