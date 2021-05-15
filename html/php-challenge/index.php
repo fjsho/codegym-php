@@ -132,16 +132,14 @@ function makeLink($value)
                     <p class="day">
                         <!-- 課題：リツイートといいね機能の実装 -->
                         <!-- RT機能 -->
-                        <!-- RT数を取得する -->
                         <?php
+                        // RT数を取得する
                         $isRetweet = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'] ;
                         $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
                         $retweetCounts->bindParam(1,$isRetweet,PDO::PARAM_INT);
                         $retweetCounts->execute();
-                        $retweetCount = $retweetCounts->fetch();                        
-                        ?>
-                        <!-- RTの有無により画像と文字色を変更する -->
-                        <?php
+                        $retweetCount = $retweetCounts->fetch();
+                        //RTの有無により画像と文字色を変更する
                         $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg' ;
                         $imgColor = $retweetCount['cnt'] > 0 ?'color:blue;' : 'color:gray;' ;
                         ?>
