@@ -112,7 +112,11 @@ function makeLink($value)
             ?>
                 <div class="msg">
                     <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
-                    <!-- RT投稿（retweet_post_id != 0）の場合は、元の投稿者の名前を表示する -->
+                    <!-- RTした人の名前の表示 -->
+                    <?php if($post['retweet_post_id']): ?>
+                    <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
+                    <?php endif; ?>
+                    <!-- RT投稿（retweet_post_id != 0）の場合は、投稿内容の後に元の投稿者の名前を表示する -->
                     <?php
                     if($post['retweet_post_id']){
                         $postNames = $db->prepare('SELECT m.name FROM members m, posts p WHERE m.id=p.member_id and p.id=?');
