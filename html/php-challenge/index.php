@@ -19,23 +19,12 @@ if (isset($_SESSION['id']) && $_SESSION['time'] + 3600 > time()) {
 if (!empty($_POST)) {
     if ($_POST['message'] != '') {
         $message = $db->prepare('INSERT INTO posts SET member_id=?, message=?, reply_post_id=?, retweet_post_id=?, created=NOW()');
-        //リツイートの場合
-        if($_POST['retweet_post_id'] != ''){
-            $message->execute(array(
-                $_POST['member_id'],
-                $_POST['message'],
-                $_POST['reply_post_id'],
-                $_POST['retweet_post_id']
-            ));
-        }else{
-        //通常の場合
             $message->execute(array(
                 $member['id'],
                 $_POST['message'],
                 $_POST['reply_post_id'],
                 $_POST['retweet_post_id']
             ));
-        }
 
         header('Location: index.php');
         exit();
@@ -123,7 +112,18 @@ function makeLink($value)
             ?>
                 <div class="msg">
                     <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
-                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($post['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
+                    <!-- RT投稿（retweet_post_id != 0）の場合は、元の投稿者の名前を表示する -->
+                    <?php
+                    if($post['retweet_post_id']){
+                        $postNames = $db->prepare('SELECT m.name FROM members m, posts p WHERE m.id=p.member_id and p.id=?');
+                        $postNames->bindParam(1,$post['retweet_post_id'],PDO::PARAM_INT);
+                        $postNames->execute();
+                        $postName = $postNames->fetch();                        
+                    }else{
+                        $postName['name'] = $post['name'];
+                    }
+                    ?>
+                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($postName['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
 
                     <p class="day">
                         <!-- 課題：リツイートといいね機能の実装 -->
@@ -143,7 +143,6 @@ function makeLink($value)
                         
                         <form action="" method="post">
                             <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
-                            <input type="hidden" name="member_id" value="<?php echo h($post['member_id']); ?>" />                        
                             <input type="hidden" name="reply_post_id" value="" />
                             <!-- RT投稿と取り消しの分岐 -->
                             <?php if($post['retweet_post_id'] != 0 && $post['name'] === $member['name']): ?>
