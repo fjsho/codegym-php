@@ -140,22 +140,24 @@ function makeLink($value)
                         }
                         ?>
                         <!-- RTボタン -->
-                        
                         <form action="" method="post">
                             <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
                             <input type="hidden" name="reply_post_id" value="" />
+                            <!-- RTの有無による画像と文字色の変更 -->
+                            <?php $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg' ; ?>
+                            <?php $imgColor = $retweetCount['cnt'] > 0 ?'color:blue;' : 'color:gray;' ; ?>
                             <!-- RT投稿と取り消しの分岐 -->
                             <?php if($post['retweet_post_id'] != 0 && $post['name'] === $member['name']): ?>
                                 <!-- RT取り消し -->
-                                <a class="retweet" href="delete.php?id=<?php echo h($post['id']); ?>"><img  class="retweet-image" src="images/retweet-solid-gray.svg" alt=""></a><span style="color:gray;"><?php echo $retweetCount['cnt']; ?></span>
+                                <a class="retweet" href="delete.php?id=<?php echo h($post['id']); ?>"><img  class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                             <?php else: ?>
                                 <!-- RT投稿 -->
-                                <!-- retweet_post_id：初回リツイート時は投稿id、２回目以降はRTのidで送信 -->
+                                <!-- retweet_post_id：初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
                                 <?php $retweetId = $post['retweet_post_id'] == 0 ? $post['id'] : $post['retweet_post_id']; ?>
                                 <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
                                 
                                 <span class="retweet">
-                                    <input class="retweet-image" type="image" src="images/retweet-solid-gray.svg"/><span style="color:gray;"><?php echo $retweetCount['cnt']; ?></span>
+                                    <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                                 </span>
                             <?php endif; ?>
                         </form>
