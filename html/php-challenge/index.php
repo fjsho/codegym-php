@@ -18,6 +18,7 @@ if (isset($_SESSION['id']) && $_SESSION['time'] + 3600 > time()) {
 // 投稿を記録する
 if (!empty($_POST)) {
     if ($_POST['message'] != '') {
+        //postsテーブルへの記録
         $message = $db->prepare('INSERT INTO posts SET member_id=?, message=?, reply_post_id=?, retweet_post_id=?, created=NOW()');
             $message->execute(array(
                 $member['id'],
@@ -28,6 +29,18 @@ if (!empty($_POST)) {
 
         header('Location: index.php');
         exit();
+
+    }else{
+        //favoritesテーブルへの記録
+        $favorite = $db->prepare('INSERT INTO favorites SET member_id=?, post_id=?, created=NOW()');
+            $favorite->execute(array(
+                $member['id'],
+                $_POST['post_id'],
+            ));
+
+        header('Location: index.php');
+        exit();
+
     }
 }
 
@@ -131,7 +144,7 @@ function makeLink($value)
 
                     <p class="day">
                         <!-- 課題：リツイートといいね機能の実装 -->
-                        <!-- RT機能 -->
+                        <!-- RT機能ここから -->
                         <?php
                         // RT数を取得する
                         $isRetweet = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'] ;
@@ -165,9 +178,17 @@ function makeLink($value)
                         </form>
                         <!-- RT機能ここまで -->
 
-                        <span class="favorite">
-                            <img class="favorite-image" src="images/heart-solid-gray.svg"><span style="color:gray;">34</span>
-                        </span>
+                        <!-- いいね機能ここから -->
+                        <!-- いいねボタン -->
+                        <form action="" method="post">
+                            <input type="hidden" name="post_id" value="<?php echo h($isRetweet); ?>" />
+
+                            <span class="favorite">
+                                <input class="favorite-image" type="image" src="images/heart-solid-gray.svg" alt="いいね！"/><span style="color:gray;">34</span>
+                            </span>
+                        </form>
+
+                        <!-- いいね機能ここまで -->
 
                         <a href="view.php?id=<?php echo h($post['id']); ?>"><?php echo h($post['created']); ?></a>
                         <?php
