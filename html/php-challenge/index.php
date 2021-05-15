@@ -134,22 +134,22 @@ function makeLink($value)
                         <!-- RT機能 -->
                         <!-- RT数を取得する -->
                         <?php
-                        if($post['retweet_post_id']){
-                            $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
-                            $retweetCounts->bindParam(1,$post['retweet_post_id'],PDO::PARAM_INT);
-                            $retweetCounts->execute();
-                            $retweetCount = $retweetCounts->fetch();                        
-                        }else{
-                            $retweetCount = 0;
-                        }
+                        $isRetweet = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'] ;
+                        $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
+                        $retweetCounts->bindParam(1,$isRetweet,PDO::PARAM_INT);
+                        $retweetCounts->execute();
+                        $retweetCount = $retweetCounts->fetch();                        
+                        ?>
+                        <!-- RTの有無により画像と文字色を変更する -->
+                        <?php
+                        $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg' ;
+                        $imgColor = $retweetCount['cnt'] > 0 ?'color:blue;' : 'color:gray;' ;
                         ?>
                         <!-- RTボタン -->
                         <form action="" method="post">
                             <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
                             <input type="hidden" name="reply_post_id" value="" />
-                            <!-- RTの有無による画像と文字色の変更 -->
-                            <?php $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg' ; ?>
-                            <?php $imgColor = $retweetCount['cnt'] > 0 ?'color:blue;' : 'color:gray;' ; ?>
+
                             <!-- RT投稿と取り消しの分岐 -->
                             <?php if($post['retweet_post_id'] != 0 && $post['name'] === $member['name']): ?>
                                 <!-- RT取り消し -->
