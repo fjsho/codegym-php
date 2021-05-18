@@ -121,7 +121,7 @@ function makeLink($value)
             </form>
 
             <?php
-            foreach ($posts as $post) : //投稿ごとに値を読み込んでる⇨favoriteの値もここで読み込んでもらう必要がある
+            foreach ($posts as $post) : 
             ?>
                 <div class="msg">
                     <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
@@ -187,6 +187,14 @@ function makeLink($value)
                             $originalPostId
                         ));
                         $favorite = $favorites->fetch();
+                        // いいね数を数える
+                        $favoriteCounts = $db->prepare('SELECT COUNT(id) AS cnt FROM favorites WHERE post_id=?');
+                        $favoriteCounts->bindParam(1,$originalPostId,PDO::PARAM_INT);
+                        $favoriteCounts->execute();
+                        $favoriteCount = $favoriteCounts->fetch();
+                        //いいねの有無により画像と文字色を変更する
+                        $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg' ;
+                        $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ?'color:red;' : 'color:gray;' ;
                         ?>
                         <!-- いいねボタン -->
                         <form action="" method="post">
@@ -195,12 +203,12 @@ function makeLink($value)
                             <!-- いいね！といいね取り消しの分岐 -->
                             <?php if($favorite['favorite_id']): ?>
                             <!-- いいね！取り消し -->
-                            <a class="favorite" href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img  class="favorite-image" src="images/heart-solid-red.svg" alt="いいね！を取り消す"></a><span style="color:red">34</span>
+                            <a class="favorite" href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img  class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
                             
                             <?php else: ?>
                             <!-- いいね！投稿 -->
                             <span class="favorite">
-                                <input class="favorite-image" type="image" src="images/heart-solid-gray.svg" alt="いいね！"/><span style="color:gray;">34</span>
+                                <input class="favorite-image" type="image" src="<?php echo $imgSrc; ?>" alt="いいね！"/><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
                             </span>
                             <?php endif; ?>
 
