@@ -121,7 +121,7 @@ function makeLink($value)
             </form>
 
             <?php
-            foreach ($posts as $post) :
+            foreach ($posts as $post) : //投稿ごとに値を読み込んでる⇨favoriteの値もここで読み込んでもらう必要がある
             ?>
                 <div class="msg">
                     <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
@@ -147,9 +147,9 @@ function makeLink($value)
                         <!-- RT機能ここから -->
                         <?php
                         // RT数を取得する
-                        $isRetweet = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'] ;
+                        $originalPostId = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'] ;
                         $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
-                        $retweetCounts->bindParam(1,$isRetweet,PDO::PARAM_INT);
+                        $retweetCounts->bindParam(1,$originalPostId,PDO::PARAM_INT);
                         $retweetCounts->execute();
                         $retweetCount = $retweetCounts->fetch();
                         //RTの有無により画像と文字色を変更する
@@ -162,7 +162,7 @@ function makeLink($value)
                             <input type="hidden" name="reply_post_id" value="" />
 
                             <!-- RT投稿と取り消しの分岐 -->
-                            <?php if($post['retweet_post_id'] != 0 && $post['name'] === $member['name']): ?>
+                            <?php if($post['retweet_post_id'] !== 0 && $post['name'] === $member['name']): ?>
                                 <!-- RT取り消し -->
                                 <a class="retweet" href="delete.php?id=<?php echo h($post['id']); ?>"><img  class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                             <?php else: ?>
@@ -179,13 +179,31 @@ function makeLink($value)
                         <!-- RT機能ここまで -->
 
                         <!-- いいね機能ここから -->
+                        <?php
+                        // 自分のいいね！を取得する
+                        $favorites = $db->prepare('SELECT f.id AS favorite_id, f.member_id, p.id AS post_id, p.retweet_post_id  FROM favorites f, posts p WHERE p.retweet_post_id=f.post_id AND f.member_id=? AND f.post_id=?');
+                        $favorites->execute(array(
+                            $member['id'],
+                            $originalPostId
+                        ));
+                        $favorite = $favorites->fetch();
+                        ?>
                         <!-- いいねボタン -->
                         <form action="" method="post">
-                            <input type="hidden" name="post_id" value="<?php echo h($isRetweet); ?>" />
+                            <input type="hidden" name="post_id" value="<?php echo h($originalPostId); ?>" />
 
+                            <!-- いいね！といいね取り消しの分岐 -->
+                            <?php if($favorite['favorite_id']): ?>
+                            <!-- いいね！取り消し -->
+                            <a class="favorite" href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img  class="favorite-image" src="images/heart-solid-red.svg" alt="いいね！を取り消す"></a><span style="color:red">34</span>
+                            
+                            <?php else: ?>
+                            <!-- いいね！投稿 -->
                             <span class="favorite">
                                 <input class="favorite-image" type="image" src="images/heart-solid-gray.svg" alt="いいね！"/><span style="color:gray;">34</span>
                             </span>
+                            <?php endif; ?>
+
                         </form>
 
                         <!-- いいね機能ここまで -->
