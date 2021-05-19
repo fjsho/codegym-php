@@ -129,7 +129,7 @@ function makeLink($value)
                     <?php if($post['retweet_post_id']): ?>
                     <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
                     <?php endif; ?>
-                    <!-- RT投稿（retweet_post_id != 0）の場合は、投稿内容の後に元の投稿者の名前を表示する -->
+                    <!-- RT投稿の場合は、投稿内容の後に元の投稿者の名前を表示する -->
                     <?php
                     if($post['retweet_post_id']){
                         $postNames = $db->prepare('SELECT m.name FROM members m, posts p WHERE m.id=p.member_id and p.id=?');
@@ -157,21 +157,21 @@ function makeLink($value)
                         $imgColor = $retweetCount['cnt'] > 0 ?'color:blue;' : 'color:gray;' ;
                         ?>
                         <!-- RTボタン -->
-                        <form action="" method="post">
+                        <form  class="retweet" action="" method="post">
                             <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
                             <input type="hidden" name="reply_post_id" value="" />
 
                             <!-- RT投稿と取り消しの分岐 -->
                             <?php if($post['retweet_post_id'] !== 0 && $post['name'] === $member['name']): ?>
                                 <!-- RT取り消し -->
-                                <a class="retweet" href="delete.php?id=<?php echo h($post['id']); ?>"><img  class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
+                                <a href="delete.php?id=<?php echo h($post['id']); ?>"><img  class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                             <?php else: ?>
                                 <!-- RT投稿 -->
-                                <!-- retweet_post_id：初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
+                                <!-- 初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
                                 <?php $retweetId = $post['retweet_post_id'] == 0 ? $post['id'] : $post['retweet_post_id']; ?>
                                 <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
                                 
-                                <span class="retweet">
+                                <span>
                                     <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                                 </span>
                             <?php endif; ?>
@@ -197,17 +197,17 @@ function makeLink($value)
                         $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ?'color:red;' : 'color:gray;' ;
                         ?>
                         <!-- いいねボタン -->
-                        <form action="" method="post">
+                        <form class="favorite" action="" method="post">
                             <input type="hidden" name="post_id" value="<?php echo h($originalPostId); ?>" />
 
                             <!-- いいね！といいね取り消しの分岐 -->
                             <?php if($favorite['favorite_id']): ?>
                             <!-- いいね！取り消し -->
-                            <a class="favorite" href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img  class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
+                            <a href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img  class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
                             
                             <?php else: ?>
                             <!-- いいね！投稿 -->
-                            <span class="favorite">
+                            <span>
                                 <input class="favorite-image" type="image" src="<?php echo $imgSrc; ?>" alt="いいね！"/><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
                             </span>
                             <?php endif; ?>
