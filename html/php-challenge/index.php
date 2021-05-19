@@ -20,27 +20,25 @@ if (!empty($_POST)) {
     if ($_POST['message'] != '') {
         //postsテーブルへの記録
         $message = $db->prepare('INSERT INTO posts SET member_id=?, message=?, reply_post_id=?, retweet_post_id=?, created=NOW()');
-            $message->execute(array(
-                $member['id'],
-                $_POST['message'],
-                $_POST['reply_post_id'],
-                $_POST['retweet_post_id']
-            ));
+        $message->execute(array(
+            $member['id'],
+            $_POST['message'],
+            $_POST['reply_post_id'],
+            $_POST['retweet_post_id']
+        ));
 
         header('Location: index.php');
         exit();
-
-    }else{
+    } else {
         //favoritesテーブルへの記録
         $favorite = $db->prepare('INSERT INTO favorites SET member_id=?, post_id=?, created=NOW()');
-            $favorite->execute(array(
-                $member['id'],
-                $_POST['post_id'],
-            ));
+        $favorite->execute(array(
+            $member['id'],
+            $_POST['post_id'],
+        ));
 
         header('Location: index.php');
         exit();
-
     }
 }
 
@@ -121,22 +119,22 @@ function makeLink($value)
             </form>
 
             <?php
-            foreach ($posts as $post) : 
+            foreach ($posts as $post) :
             ?>
                 <div class="msg">
                     <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
                     <!-- RTした人の名前の表示 -->
-                    <?php if($post['retweet_post_id']): ?>
-                    <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
+                    <?php if ($post['retweet_post_id']) : ?>
+                        <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
                     <?php endif; ?>
                     <!-- RT投稿の場合は、投稿内容の後に元の投稿者の名前を表示する -->
                     <?php
-                    if($post['retweet_post_id']){
+                    if ($post['retweet_post_id']) {
                         $postNames = $db->prepare('SELECT m.name FROM members m, posts p WHERE m.id=p.member_id and p.id=?');
-                        $postNames->bindParam(1,$post['retweet_post_id'],PDO::PARAM_INT);
+                        $postNames->bindParam(1, $post['retweet_post_id'], PDO::PARAM_INT);
                         $postNames->execute();
-                        $postName = $postNames->fetch();                        
-                    }else{
+                        $postName = $postNames->fetch();
+                    } else {
                         $postName['name'] = $post['name'];
                     }
                     ?>
@@ -147,90 +145,90 @@ function makeLink($value)
                         <!-- RT機能ここから -->
                         <?php
                         // RT数を取得する
-                        $originalPostId = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'] ;
+                        $originalPostId = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'];
                         $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
-                        $retweetCounts->bindParam(1,$originalPostId,PDO::PARAM_INT);
+                        $retweetCounts->bindParam(1, $originalPostId, PDO::PARAM_INT);
                         $retweetCounts->execute();
                         $retweetCount = $retweetCounts->fetch();
                         //RTの有無により画像と文字色を変更する
-                        $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg' ;
-                        $imgColor = $retweetCount['cnt'] > 0 ?'color:blue;' : 'color:gray;' ;
+                        $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg';
+                        $imgColor = $retweetCount['cnt'] > 0 ? 'color:blue;' : 'color:gray;';
                         ?>
                         <!-- RTボタン -->
-                        <form  class="retweet" action="" method="post">
-                            <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />                        
-                            <input type="hidden" name="reply_post_id" value="" />
+                    <form class="retweet" action="" method="post">
+                        <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />
+                        <input type="hidden" name="reply_post_id" value="" />
 
-                            <!-- RT投稿と取り消しの分岐 -->
-                            <?php if($post['retweet_post_id'] !== 0 && $post['name'] === $member['name']): ?>
-                                <!-- RT取り消し -->
-                                <a href="delete.php?id=<?php echo h($post['id']); ?>"><img  class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
-                            <?php else: ?>
-                                <!-- RT投稿 -->
-                                <!-- 初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
-                                <?php $retweetId = $post['retweet_post_id'] == 0 ? $post['id'] : $post['retweet_post_id']; ?>
-                                <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
-                                
-                                <span>
-                                    <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
-                                </span>
-                            <?php endif; ?>
-                        </form>
-                        <!-- RT機能ここまで -->
+                        <!-- RT投稿と取り消しの分岐 -->
+                        <?php if ($post['retweet_post_id'] !== 0 && $post['name'] === $member['name']) : ?>
+                            <!-- RT取り消し -->
+                            <a href="delete.php?id=<?php echo h($post['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
+                        <?php else : ?>
+                            <!-- RT投稿 -->
+                            <!-- 初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
+                            <?php $retweetId = $post['retweet_post_id'] == 0 ? $post['id'] : $post['retweet_post_id']; ?>
+                            <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
 
-                        <!-- いいね機能ここから -->
-                        <?php
-                        // 自分のいいね！を取得する
-                        $favorites = $db->prepare('SELECT f.id AS favorite_id, f.member_id, p.id AS post_id, p.retweet_post_id  FROM favorites f, posts p WHERE p.retweet_post_id=f.post_id AND f.member_id=? AND f.post_id=?');
-                        $favorites->execute(array(
-                            $member['id'],
-                            $originalPostId
-                        ));
-                        $favorite = $favorites->fetch();
-                        // いいね数を数える
-                        $favoriteCounts = $db->prepare('SELECT COUNT(id) AS cnt FROM favorites WHERE post_id=?');
-                        $favoriteCounts->bindParam(1,$originalPostId,PDO::PARAM_INT);
-                        $favoriteCounts->execute();
-                        $favoriteCount = $favoriteCounts->fetch();
-                        //いいねの有無により画像と文字色を変更する
-                        $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg' ;
-                        $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ?'color:red;' : 'color:gray;' ;
-                        ?>
-                        <!-- いいねボタン -->
-                        <form class="favorite" action="" method="post">
-                            <input type="hidden" name="post_id" value="<?php echo h($originalPostId); ?>" />
+                            <span>
+                                <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
+                            </span>
+                        <?php endif; ?>
+                    </form>
+                    <!-- RT機能ここまで -->
 
-                            <!-- いいね！といいね取り消しの分岐 -->
-                            <?php if($favorite['favorite_id']): ?>
+                    <!-- いいね機能ここから -->
+                    <?php
+                    // 自分のいいね！を取得する
+                    $favorites = $db->prepare('SELECT f.id AS favorite_id, f.member_id, p.id AS post_id, p.retweet_post_id  FROM favorites f, posts p WHERE p.retweet_post_id=f.post_id AND f.member_id=? AND f.post_id=?');
+                    $favorites->execute(array(
+                        $member['id'],
+                        $originalPostId
+                    ));
+                    $favorite = $favorites->fetch();
+                    // いいね数を数える
+                    $favoriteCounts = $db->prepare('SELECT COUNT(id) AS cnt FROM favorites WHERE post_id=?');
+                    $favoriteCounts->bindParam(1, $originalPostId, PDO::PARAM_INT);
+                    $favoriteCounts->execute();
+                    $favoriteCount = $favoriteCounts->fetch();
+                    //いいねの有無により画像と文字色を変更する
+                    $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg';
+                    $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ? 'color:red;' : 'color:gray;';
+                    ?>
+                    <!-- いいねボタン -->
+                    <form class="favorite" action="" method="post">
+                        <input type="hidden" name="post_id" value="<?php echo h($originalPostId); ?>" />
+
+                        <!-- いいね！といいね取り消しの分岐 -->
+                        <?php if ($favorite['favorite_id']) : ?>
                             <!-- いいね！取り消し -->
-                            <a href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img  class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
-                            
-                            <?php else: ?>
+                            <a href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
+
+                        <?php else : ?>
                             <!-- いいね！投稿 -->
                             <span>
-                                <input class="favorite-image" type="image" src="<?php echo $imgSrc; ?>" alt="いいね！"/><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
+                                <input class="favorite-image" type="image" src="<?php echo $imgSrc; ?>" alt="いいね！" /><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
                             </span>
-                            <?php endif; ?>
+                        <?php endif; ?>
 
-                        </form>
+                    </form>
 
-                        <!-- いいね機能ここまで -->
+                    <!-- いいね機能ここまで -->
 
-                        <a href="view.php?id=<?php echo h($post['id']); ?>"><?php echo h($post['created']); ?></a>
-                        <?php
-                        if ($post['reply_post_id'] > 0) :
-                        ?><a href="view.php?id=<?php echo h($post['reply_post_id']); ?>">
-                                返信元のメッセージ</a>
-                        <?php
-                        endif;
-                        ?>
-                        <?php
-                        if ($_SESSION['id'] == $post['member_id']) :
-                        ?>
-                            [<a href="delete.php?id=<?php echo h($post['id']); ?>" style="color: #F33;">削除</a>]
-                        <?php
-                        endif;
-                        ?>
+                    <a href="view.php?id=<?php echo h($post['id']); ?>"><?php echo h($post['created']); ?></a>
+                    <?php
+                    if ($post['reply_post_id'] > 0) :
+                    ?><a href="view.php?id=<?php echo h($post['reply_post_id']); ?>">
+                            返信元のメッセージ</a>
+                    <?php
+                    endif;
+                    ?>
+                    <?php
+                    if ($_SESSION['id'] == $post['member_id']) :
+                    ?>
+                        [<a href="delete.php?id=<?php echo h($post['id']); ?>" style="color: #F33;">削除</a>]
+                    <?php
+                    endif;
+                    ?>
                     </p>
                 </div>
             <?php
