@@ -179,7 +179,7 @@ function makeLink($value)
                     <!-- いいね機能ここから -->
                     <?php
                     // 自分のいいね！を取得する
-                    $favorites = $db->prepare('SELECT f.id AS favorite_id, f.member_id, p.id AS post_id, p.retweet_post_id  FROM favorites f, posts p WHERE p.retweet_post_id=f.post_id AND f.member_id=? AND f.post_id=?');
+                    $favorites = $db->prepare('SELECT f.id AS favorite_id, f.member_id, p.id AS post_id, p.retweet_post_id  FROM favorites f, posts p WHERE p.id=f.post_id AND f.member_id=? AND f.post_id=?');
                     $favorites->execute(array(
                         $member['id'],
                         $originalPostId
