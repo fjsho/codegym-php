@@ -7,7 +7,7 @@ if (isset($_SESSION['id'])) {
 
     // いいね！を削除する
     $del = $db->prepare('DELETE FROM favorites WHERE id=? AND member_id=?');
-    $del->execute(array($id,$_SESSION['id']));
+    $del->execute(array($id, $_SESSION['id']));
 }
 
 header('Location: index.php');
