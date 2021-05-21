@@ -195,22 +195,11 @@ function makeLink($value)
                     $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'color:red;' : 'color:gray;';
                     ?>
                     <!-- いいねボタン -->
-                    <form class="favorite" action="" method="post">
-                        <input type="hidden" name="post_id" value="<?php echo h($originalPostId); ?>" />
-
-                        <!-- いいね！といいね取り消しの分岐 -->
-                        <?php if ($favorite['favorite_id']) : ?>
-                            <!-- いいね！取り消し -->
-                            <a href="delete_fav.php?id=<?php echo h($favorite['favorite_id']); ?>"><img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
-
-                        <?php else : ?>
-                            <!-- いいね！投稿 -->
-                            <span>
-                                <input class="favorite-image" type="image" src="<?php echo $imgSrc; ?>" alt="いいね！" /><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
-                            </span>
-                        <?php endif; ?>
-
-                    </form>
+                    <div class="favorite">
+                        <!-- いいね！の追加と削除 -->
+                        <?php $changeFav = $favorite['favorite_id'] > 0 ? "delete_fav.php" : "create_fav.php" ?>
+                            <a href= "<?php echo $changeFav ?>?id=<?php echo h($favorite['favorite_id']); ?>&post_id=<?php echo h($originalPostId); ?>"><img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
+                    </div>
 
                     <!-- いいね機能ここまで -->
 
