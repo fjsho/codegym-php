@@ -5,16 +5,9 @@ require('dbconnect.php');
 if (isset($_SESSION['id'])) {
     $id = $_REQUEST['id'];
 
-    // いいね！を検査する
-    $favorites = $db->prepare('SELECT * FROM favorites WHERE id=?');
-    $favorites->execute(array($id));
-    $favorite = $favorites->fetch();
-
-    if ($favorite['member_id'] == $_SESSION['id']) {
-        // 削除する
-        $del = $db->prepare('DELETE FROM favorites WHERE id=?');
-        $del->execute(array($id));
-    }
+    // いいね！を削除する
+    $del = $db->prepare('DELETE FROM favorites WHERE id=? AND member_id=?');
+    $del->execute(array($id,$_SESSION['id']));
 }
 
 header('Location: index.php');
