@@ -44,7 +44,7 @@ if (!empty($_POST)) {
 
 // 投稿を取得する
 $page = $_REQUEST['page'];
-if ($page == '') {
+if ($page === '') {
     $page = 1;
 }
 $page = max($page, 1);
@@ -160,13 +160,13 @@ function makeLink($value)
                         <input type="hidden" name="reply_post_id" value="" />
 
                         <!-- RT投稿と取り消しの分岐 -->
-                        <?php if ($post['retweet_post_id'] !== 0 && $post['name'] === $member['name']) : ?>
+                        <?php if ((int)$post['retweet_post_id'] !== 0 && $post['name'] === $member['name']) : ?>
                             <!-- RT取り消し -->
                             <a href="delete.php?id=<?php echo h($post['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                         <?php else : ?>
                             <!-- RT投稿 -->
                             <!-- 初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
-                            <?php $retweetId = $post['retweet_post_id'] == 0 ? $post['id'] : $post['retweet_post_id']; ?>
+                            <?php $retweetId = (int)$post['retweet_post_id'] === 0 ? $post['id'] : $post['retweet_post_id']; ?>
                             <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
 
                             <span>
@@ -191,8 +191,8 @@ function makeLink($value)
                     $favoriteCounts->execute();
                     $favoriteCount = $favoriteCounts->fetch();
                     //いいねの有無により画像と文字色を変更する
-                    $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg';
-                    $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] == $favorite['member_id'] ? 'color:red;' : 'color:gray;';
+                    $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg';
+                    $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'color:red;' : 'color:gray;';
                     ?>
                     <!-- いいねボタン -->
                     <form class="favorite" action="" method="post">
@@ -223,7 +223,7 @@ function makeLink($value)
                     endif;
                     ?>
                     <?php
-                    if ($_SESSION['id'] == $post['member_id']) :
+                    if ($_SESSION['id'] === $post['member_id']) :
                     ?>
                         [<a href="delete.php?id=<?php echo h($post['id']); ?>" style="color: #F33;">削除</a>]
                     <?php
