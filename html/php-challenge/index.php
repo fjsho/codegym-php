@@ -29,16 +29,6 @@ if (!empty($_POST)) {
 
         header('Location: index.php');
         exit();
-    } else {
-        //favoritesテーブルへの記録
-        $favorite = $db->prepare('INSERT INTO favorites SET member_id=?, post_id=?, created=NOW()');
-        $favorite->execute(array(
-            $member['id'],
-            $_POST['post_id'],
-        ));
-
-        header('Location: index.php');
-        exit();
     }
 }
 
