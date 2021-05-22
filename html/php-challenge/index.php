@@ -195,7 +195,7 @@ function makeLink($value)
                         <!-- いいね！投稿といいね取り消しの分岐 -->
                         <?php $changeFav = $favorite['favorite_id'] > 0 ? "delete_fav.php" : "create_fav.php" ?>
                         <a href="<?php echo $changeFav ?>?id=<?php echo h($favorite['favorite_id']); ?>&post_id=<?php echo h($originalPostId); ?>">
-                        <img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！"></a><span style="<?php echo $imgColor; ?>"><?php echo h($favoriteCount['cnt']); ?></span>
+                            <img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！"></a><span style="<?php echo $imgColor; ?>"><?php echo h($favoriteCount['cnt']); ?></span>
                     </div>
 
                     <!-- いいね機能ここまで -->
