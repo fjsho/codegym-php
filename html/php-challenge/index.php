@@ -158,8 +158,8 @@ function makeLink($value)
                         $retweetPosts->execute();
                         $retweetPost = $retweetPosts->fetch();
                         //RTの有無により画像と文字色を変更する
-                        $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg';
-                        $imgColor = $retweetCount['cnt'] > 0 ? 'color:blue;' : 'color:gray;';
+                        $imgSrc = $retweetCount['cnt'] > 0 && $retweetPost['member_id'] === $member['id'] ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg';
+                        $imgColor = $retweetCount['cnt'] > 0 && $retweetPost['member_id'] === $member['id'] ? 'color:blue;' : 'color:gray;';
                         ?>
                         <!-- RTボタン -->
                     <form class="retweet" action="" method="post">
