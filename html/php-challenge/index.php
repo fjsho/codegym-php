@@ -159,14 +159,14 @@ function makeLink($value)
                         <!-- RT投稿とRT取り消しの分岐 -->
                         <?php if ($retweetPost['member_id'] === $member['id']) : ?>
                             <!-- RT取り消し -->
-                            <a href="delete.php?id=<?php echo h($retweetPost['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
+                            <a href="delete.php?id=<?php echo h($retweetPost['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo h($retweetCount['cnt']); ?></span>
                         <?php else : ?>
                             <!-- RT投稿 -->
                             <!-- 初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
                             <input type="hidden" name="retweet_post_id" value="<?php echo h($originalPostId); ?>" />
 
                             <span>
-                                <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
+                                <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo h($retweetCount['cnt']); ?></span>
                             </span>
                         <?php endif; ?>
                     </form>
@@ -195,7 +195,7 @@ function makeLink($value)
                         <!-- いいね！投稿といいね取り消しの分岐 -->
                         <?php $changeFav = $favorite['favorite_id'] > 0 ? "delete_fav.php" : "create_fav.php" ?>
                         <a href="<?php echo $changeFav ?>?id=<?php echo h($favorite['favorite_id']); ?>&post_id=<?php echo h($originalPostId); ?>">
-                        <img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
+                        <img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！"></a><span style="<?php echo $imgColor; ?>"><?php echo h($favoriteCount['cnt']); ?></span>
                     </div>
 
                     <!-- いいね機能ここまで -->
