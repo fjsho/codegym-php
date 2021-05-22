@@ -166,7 +166,7 @@ function makeLink($value)
                         <input type="hidden" name="message" value="<?php echo h($post['message']); ?>" />
                         <input type="hidden" name="reply_post_id" value="" />
 
-                        <!-- RT投稿と取り消しの分岐 -->
+                        <!-- RT投稿とRT取り消しの分岐 -->
                         <?php if ($retweetPost['member_id'] === $member['id']) : ?>
                             <!-- RT取り消し -->
                             <a href="delete.php?id=<?php echo h($retweetPost['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
@@ -202,9 +202,10 @@ function makeLink($value)
                     ?>
                     <!-- いいねボタン -->
                     <div class="favorite">
-                        <!-- いいね！の追加と削除 -->
+                        <!-- いいね！投稿といいね取り消しの分岐 -->
                         <?php $changeFav = $favorite['favorite_id'] > 0 ? "delete_fav.php" : "create_fav.php" ?>
-                        <a href="<?php echo $changeFav ?>?id=<?php echo h($favorite['favorite_id']); ?>&post_id=<?php echo h($originalPostId); ?>"><img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！を取り消す"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
+                        <a href="<?php echo $changeFav ?>?id=<?php echo h($favorite['favorite_id']); ?>&post_id=<?php echo h($originalPostId); ?>">
+                        <img class="favorite-image" src="<?php echo $imgSrc; ?>" alt="いいね！"></a><span style="<?php echo $imgColor; ?>"><?php echo $favoriteCount['cnt']; ?></span>
                     </div>
 
                     <!-- いいね機能ここまで -->
