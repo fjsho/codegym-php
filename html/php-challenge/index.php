@@ -144,12 +144,19 @@ function makeLink($value)
                         <!-- 課題：リツイートといいね機能の実装 -->
                         <!-- RT機能ここから -->
                         <?php
-                        // RT数を取得する
+                        //投稿元のidを取得する
                         $originalPostId = $post['retweet_post_id'] > 0 ? $post['retweet_post_id'] : $post['id'];
+                        // RT数を取得する
                         $retweetCounts = $db->prepare('SELECT COUNT(retweet_post_id) AS cnt FROM posts WHERE retweet_post_id=?');
                         $retweetCounts->bindParam(1, $originalPostId, PDO::PARAM_INT);
                         $retweetCounts->execute();
                         $retweetCount = $retweetCounts->fetch();
+                        //RT投稿を取得する
+                        $retweetPosts = $db->prepare('SELECT id, member_id FROM posts WHERE retweet_post_id=? AND member_id=?');
+                        $retweetPosts->bindParam(1, $originalPostId, PDO::PARAM_INT);
+                        $retweetPosts->bindParam(2, $member['id'], PDO::PARAM_INT);
+                        $retweetPosts->execute();
+                        $retweetPost = $retweetPosts->fetch();
                         //RTの有無により画像と文字色を変更する
                         $imgSrc = $retweetCount['cnt'] > 0 ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg';
                         $imgColor = $retweetCount['cnt'] > 0 ? 'color:blue;' : 'color:gray;';
@@ -160,14 +167,13 @@ function makeLink($value)
                         <input type="hidden" name="reply_post_id" value="" />
 
                         <!-- RT投稿と取り消しの分岐 -->
-                        <?php if ((int)$post['retweet_post_id'] !== 0 && $post['name'] === $member['name']) : ?>
+                        <?php if ($retweetPost['member_id'] === $member['id']) : ?>
                             <!-- RT取り消し -->
-                            <a href="delete.php?id=<?php echo h($post['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
+                            <a href="delete.php?id=<?php echo h($retweetPost['id']); ?>"><img class="retweet-image" src="<?php echo $imgSrc; ?>" alt=""></a><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
                         <?php else : ?>
                             <!-- RT投稿 -->
                             <!-- 初回リツイート時は投稿id、２回目以降はRTのidで登録する -->
-                            <?php $retweetId = (int)$post['retweet_post_id'] === 0 ? $post['id'] : $post['retweet_post_id']; ?>
-                            <input type="hidden" name="retweet_post_id" value="<?php echo h($retweetId); ?>" />
+                            <input type="hidden" name="retweet_post_id" value="<?php echo h($originalPostId); ?>" />
 
                             <span>
                                 <input class="retweet-image" type="image" src="<?php echo $imgSrc; ?>" /><span style="<?php echo $imgColor; ?>"><?php echo $retweetCount['cnt']; ?></span>
