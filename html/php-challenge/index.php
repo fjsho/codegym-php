@@ -112,23 +112,25 @@ function makeLink($value)
             foreach ($posts as $post) :
             ?>
                 <div class="msg">
-                    <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
-                    <!-- RTした人の名前の表示 -->
-                    <?php if ($post['retweet_post_id']) : ?>
-                        <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
-                    <?php endif; ?>
-                    <!-- RT投稿の場合は、投稿内容の後に元の投稿者の名前を表示する -->
+                    <!-- 元の投稿の取得 -->
                     <?php
-                    if ($post['retweet_post_id']) {
-                        $postNames = $db->prepare('SELECT m.name FROM members m, posts p WHERE m.id=p.member_id and p.id=?');
-                        $postNames->bindParam(1, $post['retweet_post_id'], PDO::PARAM_INT);
-                        $postNames->execute();
-                        $postName = $postNames->fetch();
-                    } else {
-                        $postName['name'] = $post['name'];
-                    }
+                    $originalPosts = $db->prepare('SELECT m.name, m.picture, p.* FROM members m, posts p WHERE m.id=p.member_id AND p.id=?');
+                    $originalPosts->bindParam(1, $post['retweet_post_id'], PDO::PARAM_INT);
+                    $originalPosts->execute();
+                    $originalPost = $originalPosts->fetch();
                     ?>
-                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($postName['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
+                    <!-- RTの場合 -->
+                    <?php if ($post['retweet_post_id']) : ?>
+                    <!-- 元の投稿者の画像を表示する -->
+                    <img src="member_picture/<?php echo h($originalPost['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />      
+                    <!-- RTした人の名前を表示する -->
+                    <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
+                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($originalPost['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
+                    <!-- 通常の場合 -->
+                    <?php else: ?>                  
+                    <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
+                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($post['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
+                    <?php endif; ?>
 
                     <p class="day">
                         <!-- 課題：リツイートといいね機能の実装 -->
