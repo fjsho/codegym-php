@@ -121,15 +121,15 @@ function makeLink($value)
                     ?>
                     <!-- RTの場合 -->
                     <?php if ($post['retweet_post_id']) : ?>
-                    <!-- 元の投稿者の画像を表示する -->
-                    <img src="member_picture/<?php echo h($originalPost['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />      
-                    <!-- RTした人の名前を表示する -->
-                    <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
-                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($originalPost['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
+                        <!-- 元の投稿者の画像を表示する -->
+                        <img src="member_picture/<?php echo h($originalPost['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
+                        <!-- RTした人の名前を表示する -->
+                        <p style="font-size:0.8em;"><?php echo h($post['name']); ?>さんがリツイートしました</p>
+                        <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($originalPost['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
                     <!-- 通常の場合 -->
-                    <?php else: ?>                  
-                    <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
-                    <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($post['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
+                    <?php else : ?>
+                        <img src="member_picture/<?php echo h($post['picture']); ?>" width="48" height="48" alt="<?php echo h($post['name']); ?>" />
+                        <p><?php echo makeLink(h($post['message'])); ?><span class="name">（<?php echo h($post['name']); ?>）</span>[<a href="index.php?res=<?php echo h($post['id']); ?>">Re</a>]</p>
                     <?php endif; ?>
 
                     <p class="day">
@@ -153,7 +153,7 @@ function makeLink($value)
                         $imgSrc = $retweetCount['cnt'] > 0 && $retweetPost['member_id'] === $member['id'] ? 'images/retweet-solid-blue.svg' : 'images/retweet-solid-gray.svg';
                         $imgColor = $retweetCount['cnt'] > 0 && $retweetPost['member_id'] === $member['id'] ? 'color:blue;' : 'color:gray;';
                         //RTが0なら0は表示しない
-                        if((int)$retweetCount['cnt'] === 0){
+                        if ((int)$retweetCount['cnt'] === 0) {
                             $retweetCount['cnt'] = "";
                         }
                         ?>
@@ -196,7 +196,7 @@ function makeLink($value)
                     $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg';
                     $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'color:red;' : 'color:gray;';
                     //いいねが0なら0は表示しない
-                    if((int)$favoriteCount['cnt'] === 0){
+                    if ((int)$favoriteCount['cnt'] === 0) {
                         $favoriteCount['cnt'] = "";
                     }
                     ?>
