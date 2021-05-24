@@ -195,6 +195,10 @@ function makeLink($value)
                     //いいねの有無により画像と文字色を変更する
                     $imgSrc = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'images/heart-solid-red.svg' : 'images/heart-solid-gray.svg';
                     $imgColor = $favoriteCount['cnt'] > 0 && $member['id'] === $favorite['member_id'] ? 'color:red;' : 'color:gray;';
+                    //いいねが0なら0は表示しない
+                    if((int)$favoriteCount['cnt'] === 0){
+                        $favoriteCount['cnt'] = "";
+                    }
                     ?>
                     <!-- いいねボタン -->
                     <div class="favorite">
